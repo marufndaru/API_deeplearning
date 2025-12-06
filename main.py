@@ -9,6 +9,8 @@ from keras_facenet import FaceNet
 from mtcnn.mtcnn import MTCNN
 from PIL import Image as Img
 from numpy import asarray, expand_dims
+from pyngrok import ngrok
+import nest_asyncio
 
 # 1. Inisialisasi App & Load Model
 # Model dimuat di luar fungsi agar hanya diload sekali saat server nyala (efisien)
@@ -20,7 +22,7 @@ embedder = FaceNet()
 print("✅ Model AI siap.")
 
 # 2. Load Database Wajah
-# Pastikan file .pkl ada di folder yang sama dengan main.py
+# Pastikan file .pkl ada di folder yang sama dengan main.py     <= INI PENTING!!!...
 DB_FILE = "datafacenet_aug.pkl"
 database = {}
 
@@ -107,4 +109,12 @@ async def presensi_wajah(file: UploadFile = File(...)):
 
 # 4. Blok untuk menjalankan script langsung (Opsional)
 if __name__ == "__main__":
+    # Aktifkan nest_asyncio untuk kompatibilitas
+    nest_asyncio.apply()
+    
+    # Buka tunnel ngrok
+    ngrok_tunnel = ngrok.connect(8000)
+    print('🌐 Public URL:', ngrok_tunnel.public_url)
+    
+    # Jalankan server
     uvicorn.run(app, host="127.0.0.1", port=8000)
